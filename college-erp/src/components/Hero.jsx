@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import GetStarted from "./GetStarted";
 
 export default function Hero({ onGetStarted }) {
+  const [showGetStarted, setShowGetStarted] = useState(false)
+
   return (
     <main className="relative flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-20 md:py-32 gap-12 text-white overflow-hidden">
       {/* Gradient Overlay */}
@@ -44,7 +47,7 @@ export default function Hero({ onGetStarted }) {
           transition={{ delay: 0.6, duration: 0.8 }}
         >
           <button
-            onClick={onGetStarted}
+            onClick={() => setShowGetStarted(true)}
             className="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-xl hover:scale-105 transition"
           >
             Get Started
@@ -78,8 +81,11 @@ export default function Hero({ onGetStarted }) {
             className="w-72 md:w-96 drop-shadow-lg"
           />
         </motion.div>
+        
       </motion.div>
+      
     </main>
+    
   );
   
 }

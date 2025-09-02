@@ -12,14 +12,17 @@ function App() {
       <div className="absolute inset-0 bg-black/40"></div>
 
       <Header />
-
-      {!showGetStarted ? (
+      <Hero />
+      {/* {!showGetStarted ? (
         <Hero onGetStarted={() => setShowGetStarted(true)} />
       ) : (
         <GetStarted onBack={() => setShowGetStarted(false)} />
-      )}
+      )} */}
     </div>
   );
+
+  
 }
+
 
 export default App;
