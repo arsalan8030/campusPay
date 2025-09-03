@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaTimes } from "react-icons/fa";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 
@@ -71,10 +71,48 @@ export default function Header() {
       </header>
 
       {/* Login Form Modal */}
-      {showLogin && <LoginForm onClose={() => setShowLogin(false)} />}
+      {showLogin && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-[400px] relative animate-scale-in">
+            {/* Close button */}
+            <button
+              onClick={() => setShowLogin(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+            >
+              <FaTimes size={18} />
+            </button>
+            <LoginForm
+              onClose={() => setShowLogin(false)}
+              onSwitch={() => {
+                setShowLogin(false);
+                setShowSignUp(true);
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Sign Up Form Modal */}
-      {showSignUp && <SignUpForm onClose={() => setShowSignUp(false)} />}
+      {showSignUp && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-[400px] relative animate-scale-in">
+            {/* Close button */}
+            <button
+              onClick={() => setShowSignUp(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+            >
+              <FaTimes size={18} />
+            </button>
+            <SignUpForm
+              onClose={() => setShowSignUp(false)}
+              onSwitch={() => {
+                setShowSignUp(false);
+                setShowLogin(true);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

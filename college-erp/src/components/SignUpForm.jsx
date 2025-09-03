@@ -1,83 +1,137 @@
-import React, {useState} from "react";
-import LoginForm from "./LoginForm";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Mail, Lock, Phone, BookOpen, User } from "lucide-react";
 
-export default function SignUpForm({ onClose }) {
+export default function SignUp({ onSwitch }) {
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const [showLogin, setShowLogin] = useState(false);
+  const [role, setRole] = useState("STUDENT");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    course: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!form.name || !form.email || !form.mobile || !form.course || !form.password) {
+      setError("⚠ Please fill all fields");
+      return;
+    }
+
+    login({ name: form.name, role });
+    navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");
+  };
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50">
-      {/*  Background with gradient + image */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500">
-        <img
-          src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
-          alt="Student Sign Up"
-          className="w-full h-full object-cover mix-blend-overlay opacity-60"
-        />
+    <div className="bg-white shadow-2xl rounded-2xl w-full p-8 space-y-6">
+      <h1 className="text-3xl font-bold text-center text-gray-800">
+        {role === "STUDENT" ? "Student Sign Up" : "Teacher Sign Up"}
+      </h1>
+      <p className="text-center text-gray-500">
+        Create your account to get started.
+      </p>
+
+      {/* Toggle Role */}
+      <div className="flex justify-center gap-4 mt-4">
+        {["STUDENT", "TEACHER"].map((r) => (
+          <button
+            key={r}
+            type="button"
+            onClick={() => setRole(r)}
+            className={`px-5 py-2 rounded-lg font-medium transition ${
+              role === r
+                ? "bg-teal-600 text-white shadow-md scale-105"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            {r}
+          </button>
+        ))}
       </div>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-      {/* Sign Up Card */}
-      <div className="relative bg-white/90 backdrop-blur-md rounded-2xl p-8 w-96 shadow-2xl">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-600 hover:text-black text-2xl"
-          aria-label="Close"
-        >
-          &times;
-        </button>
-
-        <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">
-          Create Account
-        </h2>
-
-        <form className="space-y-4">
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="relative">
+          <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
           <input
-            type="text"
+            name="name"
             placeholder="Full Name"
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none"
+            className="input pl-10 border-gray-300"
+            onChange={handleChange}
             required
           />
+        </div>
+        <div className="relative">
+          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
           <input
             type="email"
+            name="email"
             placeholder="Email"
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none"
+            className="input pl-10 border-gray-300"
+            onChange={handleChange}
             required
           />
+        </div>
+        <div className="relative">
+          <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <input
+            name="mobile"
+            placeholder="Mobile"
+            className="input pl-10 border-gray-300"
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="relative">
+          <BookOpen className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <input
+            name="course"
+            placeholder={role === "STUDENT" ? "Course" : "Department"}
+            className="input pl-10 border-gray-300"
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="relative">
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none"
+            className="input pl-10 border-gray-300"
+            onChange={handleChange}
             required
           />
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition"
-          >
-            Sign Up
-          </button>
-        </form>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-teal-600 text-white py-2 rounded-lg font-semibold hover:bg-teal-700 transition transform hover:scale-105"
+        >
+          Sign Up
+        </button>
+      </form>
 
-        <p className="mt-4 text-sm text-center text-gray-600">
-          Already have an account?{" "}
-           <button
-              onClick={() => setShowLogin(true)}
-             className="text-purple-600 font-semibold cursor-pointer hover:underline"
-            >
-              Login
-            </button>
-        </p>
-      </div>
-            {showLogin && <LoginForm onClose={() => setShowLogin(false)} />}
+      <p className="text-sm text-center mt-4">
+        Already have an account?{" "}
+        <button
+          onClick={onSwitch}
+          className="text-teal-600 font-semibold hover:underline"
+        >
+          Login
+        </button>
+      </p>
     </div>
   );
 }

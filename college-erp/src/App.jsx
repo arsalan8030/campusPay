@@ -1,28 +1,66 @@
-import React, { useState } from "react";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+
+import AuthContainer from "./components/AuthContainer";
+
+
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import GetStarted from "./components/GetStarted";
+import LoginForm from "./components/LoginForm";
+import SignUpForm from "./components/SignUpForm";
 
-function App() {
-  const [showGetStarted, setShowGetStarted] = useState(false);
+import StudentDashboard from "./pages/student/Dashboard";
+import TeacherDashboard from "./pages/teacher/Dashboard"; // we’ll create later
 
-  return (
-    <div className="min-h-screen bg-student-pattern bg-cover bg-center relative">
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
-
-      <Header />
-      <Hero />
-      {/* {!showGetStarted ? (
-        <Hero onGetStarted={() => setShowGetStarted(true)} />
-      ) : (
-        <GetStarted onBack={() => setShowGetStarted(false)} />
-      )} */}
-    </div>
-  );
-
-  
+function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/" />;
 }
 
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Routes>
+        {/* Home */}
+        <Route
+          path="/"
+          element={
+            <>
+              <Header />
+              <Hero />
+              <GetStarted />
+            </>
+          }
+        />
 
-export default App;
+        {/* Login & Signup */}
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/signup" element={<SignUpForm />} />
+
+        {/* Dashboards */}
+        <Route
+          path="/student-dashboard"
+          element={
+            <ProtectedRoute>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher-dashboard"
+          element={
+            <ProtectedRoute>
+              <TeacherDashboard />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route path="/campusPay" element={<Navigate to="/" />} />
+        <Route path="/auth" element={<AuthContainer />} />
+
+      </Routes>
+    </div>
+  );
+}
