@@ -13,11 +13,13 @@ import SignUpForm from "./components/SignUpForm";
 
 import StudentDashboard from "./pages/student/Dashboard";
 import TeacherDashboard from "./pages/teacher/Dashboard"; // we’ll create later
+import LearnMore from "./components/LearnMore";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/" />;
 }
+
 
 export default function App() {
   return (
@@ -29,11 +31,13 @@ export default function App() {
           element={
             <>
               <Header />
-              <Hero />
-              <GetStarted />
+              <Hero/>
             </>
           }
         />
+        <Route path="/get-started" element={<GetStarted/>} />
+        <Route path="/learn-more" element={<LearnMore/>} />
+
 
         {/* Login & Signup */}
         <Route path="/login" element={<LoginForm />} />

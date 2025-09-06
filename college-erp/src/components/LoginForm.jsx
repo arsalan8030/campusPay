@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Mail, Lock, BookOpen } from "lucide-react";
+import { AtSign, KeyRound, GraduationCap } from "lucide-react";
 
 export default function Login({ onSwitch }) {
   const { login } = useAuth();
@@ -22,12 +22,11 @@ export default function Login({ onSwitch }) {
       return;
     }
 
-    // Mock login
     login({ name: role === "STUDENT" ? "Student" : "Teacher", role });
-
-    // Redirect
     navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");
   };
+
+  const courses = ["BCA CSJM", "BCA MCU", "B.Tech", "MCA", "MBA", "M.Sc"];
 
   return (
     <div className="bg-white shadow-2xl rounded-2xl w-full p-8 space-y-6">
@@ -61,33 +60,39 @@ export default function Login({ onSwitch }) {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <AtSign className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
           <input
             type="email"
             name="email"
             placeholder="Email"
-            className="input pl-10 border-gray-300"
+            className="input pl-10 border-gray-300 w-75"
             onChange={handleChange}
             required
           />
         </div>
         <div className="relative">
-          <BookOpen className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-          <input
+          <GraduationCap className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
+          <select
             name="course"
-            placeholder={role === "STUDENT" ? "Course" : "Department"}
             className="input pl-10 border-gray-300"
             onChange={handleChange}
             required
-          />
+          >
+            <option value="">Select {role === "STUDENT" ? "Course" : "Department"}</option>
+            {courses.map((c, i) => (
+              <option key={i} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <KeyRound className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
           <input
             type="password"
             name="password"
             placeholder="Password"
-            className="input pl-10 border-gray-300"
+            className="input pl-10 border-gray-300 w-75"
             onChange={handleChange}
             required
           />
@@ -100,7 +105,6 @@ export default function Login({ onSwitch }) {
         </button>
       </form>
 
-      {/* Links */}
       <div className="flex justify-between text-sm mt-4">
         <button
           onClick={onSwitch}

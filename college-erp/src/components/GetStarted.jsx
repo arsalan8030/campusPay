@@ -17,7 +17,7 @@ export default function GetStarted({ onBack }) {
       icon: <UserPlus className="h-6 w-6 text-indigo-600" />,
       title: "Create Account",
       desc: "New here? Sign up and get started instantly.",
-      action: () => navigate("/register"), // direct to signup
+      action: () => navigate("/signup"), // Changed from "/register" to "/signup"
     },
     {
       icon: <Info className="h-6 w-6 text-indigo-600" />,

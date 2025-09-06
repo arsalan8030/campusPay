@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Mail, Lock, Phone, BookOpen, User } from "lucide-react";
+import { AtSign, KeyRound, Smartphone, GraduationCap, UserCircle } from "lucide-react"; // icons
 
 export default function SignUp({ onSwitch }) {
   const { login } = useAuth();
@@ -31,6 +31,8 @@ export default function SignUp({ onSwitch }) {
     login({ name: form.name, role });
     navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");
   };
+
+  const courses = ["BCA CSJM", "BCA MCU", "B.Tech", "MCA", "MBA", "M.Sc"];
 
   return (
     <div className="bg-white shadow-2xl rounded-2xl w-full p-8 space-y-6">
@@ -64,53 +66,59 @@ export default function SignUp({ onSwitch }) {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <UserCircle className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
           <input
             name="name"
             placeholder="Full Name"
-            className="input pl-10 border-gray-300"
+            className="input pl-10 border-gray-300 w-75"
             onChange={handleChange}
             required
           />
         </div>
         <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <AtSign className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
           <input
             type="email"
             name="email"
             placeholder="Email"
-            className="input pl-10 border-gray-300"
+            className="input pl-10 border-gray-300 w-75"
             onChange={handleChange}
             required
           />
         </div>
         <div className="relative">
-          <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Smartphone className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
           <input
             name="mobile"
             placeholder="Mobile"
-            className="input pl-10 border-gray-300"
+            className="input pl-10 border-gray-300 w-75"
             onChange={handleChange}
             required
           />
         </div>
         <div className="relative">
-          <BookOpen className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-          <input
+          <GraduationCap className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
+          <select
             name="course"
-            placeholder={role === "STUDENT" ? "Course" : "Department"}
             className="input pl-10 border-gray-300"
             onChange={handleChange}
             required
-          />
+          >
+            <option value="">Select {role === "STUDENT" ? "Course" : "Department"}</option>
+            {courses.map((c, i) => (
+              <option key={i} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <KeyRound className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
           <input
             type="password"
             name="password"
             placeholder="Password"
-            className="input pl-10 border-gray-300"
+            className="input pl-10 border-gray-300 w-75"
             onChange={handleChange}
             required
           />

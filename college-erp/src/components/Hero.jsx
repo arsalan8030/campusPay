@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import GetStarted from "./GetStarted";
+import { Link } from "react-router-dom"; // Import Link component
 
-export default function Hero({ onGetStarted }) {
-  const [showGetStarted, setShowGetStarted] = useState(false)
-
+export default function Hero() {
   return (
     <main className="relative flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-20 md:py-32 gap-12 text-white overflow-hidden">
       {/* Gradient Overlay */}
@@ -46,20 +44,23 @@ export default function Hero({ onGetStarted }) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
         >
-          <button
-            onClick={() => setShowGetStarted(true)}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-xl hover:scale-105 transition"
-          >
-            Get Started
-          </button>
+          <Link to="/get-started"> {/* Use Link component to navigate */}
+            <button
+              className="px-35 py-4 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-xl hover:scale-105 transition"
+            >
+              Get Started
+            </button>
+          </Link>
+          <Link to="/learn-more" >
           <button
             onClick={() =>
               document.getElementById("learn-more")?.scrollIntoView({ behavior: "smooth" })
             }
-            className="px-6 py-3 rounded-lg bg-white text-indigo-700 font-semibold shadow-md hover:bg-gray-100 hover:scale-105 transition"
+            className="px-35 py-4 rounded-lg bg-white text-indigo-700 font-semibold shadow-md hover:bg-gray-100 hover:scale-105 transition"
           >
             Learn More
           </button>
+          </Link>
         </motion.div>
       </motion.div>
 
@@ -81,11 +82,7 @@ export default function Hero({ onGetStarted }) {
             className="w-72 md:w-96 drop-shadow-lg"
           />
         </motion.div>
-        
       </motion.div>
-      
     </main>
-    
   );
-  
 }
