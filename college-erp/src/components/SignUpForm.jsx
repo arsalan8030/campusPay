@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { AtSign, KeyRound, Smartphone, GraduationCap, UserCircle } from "lucide-react"; // icons
+import { AtSign, KeyRound, Smartphone, GraduationCap, UserCircle, Eye, EyeOff  } from "lucide-react"; // icons
 
 export default function SignUp({ onSwitch }) {
   const { login } = useAuth();
   const navigate = useNavigate();
+   const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+
 
   const [role, setRole] = useState("STUDENT");
   const [form, setForm] = useState({
@@ -27,6 +31,15 @@ export default function SignUp({ onSwitch }) {
       setError("⚠ Please fill all fields");
       return;
     }
+
+     setLoading(true);
+    setError("");
+
+     setTimeout(() => {
+        setLoading(false);
+        console.log("Login form submitted successfully (simulated).");
+    }, 2000);
+
 
     login({ name: form.name, role });
     navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");
@@ -66,38 +79,38 @@ export default function SignUp({ onSwitch }) {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <UserCircle className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
+          <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             name="name"
             placeholder="Full Name"
-            className="input pl-10 border-gray-300 w-75"
+            className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
             onChange={handleChange}
             required
           />
         </div>
         <div className="relative">
-          <AtSign className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
+          <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="email"
             name="email"
             placeholder="Email"
-            className="input pl-10 border-gray-300 w-75"
+            className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
             onChange={handleChange}
             required
           />
         </div>
         <div className="relative">
-          <Smartphone className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
+          <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             name="mobile"
             placeholder="Mobile"
-            className="input pl-10 border-gray-300 w-75"
+            className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
             onChange={handleChange}
             required
           />
         </div>
         <div className="relative">
-          <GraduationCap className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
+          <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <select
             name="course"
             className="input pl-10 border-gray-300"
@@ -113,21 +126,33 @@ export default function SignUp({ onSwitch }) {
           </select>
         </div>
         <div className="relative">
-          <KeyRound className="absolute left-3 top-0.5 h-5 w-5 text-gray-400" />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="input pl-10 border-gray-300 w-75"
-            onChange={handleChange}
-            required
-          />
-        </div>
+                   <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                   <input
+                     type={showPassword ? "text" : "password"}
+                     name="password"
+                     placeholder="Password"
+                     className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                     onChange={handleChange}
+                     required
+                   />
+                   <span
+                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+                     onClick={() => setShowPassword(!showPassword)}
+                   >
+                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                   </span>
+                 </div>
         <button
           type="submit"
           className="w-full bg-teal-600 text-white py-2 rounded-lg font-semibold hover:bg-teal-700 transition transform hover:scale-105"
+          disabled={loading}
         >
-          Sign Up
+           {loading ? (
+              <div className="w-5 h-5 border-4 border-white border-opacity-50 rounded-full animate-spin border-t-white"></div>
+            ) : (
+              'Sign Up'
+            )}
+          {/* Sign Up */}
         </button>
       </form>
 

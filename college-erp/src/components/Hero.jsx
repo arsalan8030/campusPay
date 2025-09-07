@@ -44,7 +44,7 @@ export default function Hero() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
         >
-          <Link to="/get-started"> {/* Use Link component to navigate */}
+          <Link to="/get-started"> 
             <button
               className="px-35 py-4 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-xl hover:scale-105 transition"
             >
