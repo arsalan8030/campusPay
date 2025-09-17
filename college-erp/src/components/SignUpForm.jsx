@@ -1,170 +1,229 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { AtSign, KeyRound, Smartphone, GraduationCap, UserCircle, Eye, EyeOff  } from "lucide-react"; // icons
+import { AtSign, GraduationCap, User, Lock, Eye, EyeOff } from "lucide-react";
 
 export default function SignUp({ onSwitch }) {
-  const { login } = useAuth();
   const navigate = useNavigate();
-   const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-
-
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("STUDENT");
+
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [cooldown, setCooldown] = useState(0);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
-    mobile: "",
     course: "",
     password: "",
   });
-  const [error, setError] = useState("");
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const courses = ["BCA CSJM", "BCA MCU", "B.Tech", "MCA", "MBA", "M.Sc"];
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
 
-    if (!form.name || !form.email || !form.mobile || !form.course || !form.password) {
-      setError("⚠ Please fill all fields");
+  const requestOtp = async () => {
+    if (!form.email) {
+      setError("⚠ Enter your email");
       return;
     }
 
-     setLoading(true);
-    setError("");
-
-     setTimeout(() => {
-        setLoading(false);
-        console.log("Login form submitted successfully (simulated).");
-    }, 2000);
-
-
-    login({ name: form.name, role });
-    navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/request-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message);
+      setOtpSent(true);
+      setError("");
+      setCooldown(30);
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
   };
 
-  const courses = ["BCA CSJM", "BCA MCU", "B.Tech", "MCA", "MBA", "M.Sc"];
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!otpSent) {
+      await requestOtp();
+      return;
+    }
+    if (!otp) {
+      setError("⚠ Please enter OTP");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email, otp }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message);
+
+      const signupRes = await fetch("http://localhost:5000/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, role }),
+      });
+      const signupData = await signupRes.json();
+      if (!signupRes.ok) throw new Error(signupData.error || signupData.message);
+
+      navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
+  };
 
   return (
-    <div className="bg-white shadow-2xl rounded-2xl w-full p-8 space-y-6">
-      <h1 className="text-3xl font-bold text-center text-gray-800">
-        {role === "STUDENT" ? "Student Sign Up" : "Teacher Sign Up"}
-      </h1>
-      <p className="text-center text-gray-500">
-        Create your account to get started.
-      </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-teal-400 px-4">
+      <div className="max-w-md w-full bg-white shadow-2xl rounded-2xl p-8">
+        <h1 className="text-2xl font-bold text-center text-gray-800">
+          {otpSent ? "Verify OTP" : "Sign Up"}
+        </h1>
+        <p className="text-center text-gray-500 mb-6">
+          {otpSent ? "Enter the OTP sent to your email" : "Create your account"}
+        </p>
 
-      {/* Toggle Role */}
-      <div className="flex justify-center gap-4 mt-4">
-        {["STUDENT", "TEACHER"].map((r) => (
+        {/* Role toggle */}
+        <div className="flex justify-center gap-4 mb-6">
+          {["STUDENT", "TEACHER"].map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setRole(r)}
+              className={`px-5 py-2 rounded-lg font-medium transition ${
+                role === r
+                  ? "bg-teal-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+
+        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!otpSent && (
+            <>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  name="name"
+                  placeholder="Full Name"
+                  className="pl-10 border border-gray-300 w-full rounded-lg py-2"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="relative">
+                <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  className="pl-10 border border-gray-300 w-full rounded-lg py-2"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="relative">
+                <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <select
+                  name="course"
+                  className="pl-10 border border-gray-300 w-full rounded-lg py-2"
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Course</option>
+                  {courses.map((c, i) => (
+                    <option key={i} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  className="pl-10 border border-gray-300 w-full rounded-lg py-2"
+                  onChange={handleChange}
+                  required
+                />
+                <span
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </span>
+              </div>
+            </>
+          )}
+
+          {otpSent && (
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Enter 6-digit OTP"
+                maxLength={6}
+                className="border border-gray-300 w-full rounded-lg py-2 text-center tracking-widest"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={requestOtp}
+                className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
+                disabled={loading || cooldown > 0}
+              >
+                {cooldown > 0 ? `Resend OTP in ${cooldown}s` : "Resend OTP"}
+              </button>
+            </div>
+          )}
+
           <button
-            key={r}
-            type="button"
-            onClick={() => setRole(r)}
-            className={`px-5 py-2 rounded-lg font-medium transition ${
-              role === r
-                ? "bg-teal-600 text-white shadow-md scale-105"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            type="submit"
+            className="w-full bg-teal-600 text-white py-2 rounded-lg font-semibold hover:bg-teal-700 transition"
+            disabled={loading}
           >
-            {r}
+            {loading ? "Loading..." : otpSent ? "Verify OTP & Sign Up" : "Get OTP"}
           </button>
-        ))}
-      </div>
+        </form>
 
-      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
-          <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            name="name"
-            placeholder="Full Name"
-            className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="relative">
-          <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="relative">
-          <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            name="mobile"
-            placeholder="Mobile"
-            className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="relative">
-          <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <select
-            name="course"
-            className="input pl-10 border-gray-300"
-            onChange={handleChange}
-            required
+        <p className="text-sm text-center mt-6">
+          Already have an account?{" "}
+          <button
+            onClick={onSwitch}
+            className="text-teal-600 font-semibold hover:underline"
           >
-            <option value="">Select {role === "STUDENT" ? "Course" : "Department"}</option>
-            {courses.map((c, i) => (
-              <option key={i} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="relative">
-                   <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                   <input
-                     type={showPassword ? "text" : "password"}
-                     name="password"
-                     placeholder="Password"
-                     className="pl-10 border border-gray-300 w-full rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-                     onChange={handleChange}
-                     required
-                   />
-                   <span
-                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
-                     onClick={() => setShowPassword(!showPassword)}
-                   >
-                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                   </span>
-                 </div>
-        <button
-          type="submit"
-          className="w-full bg-teal-600 text-white py-2 rounded-lg font-semibold hover:bg-teal-700 transition transform hover:scale-105"
-          disabled={loading}
-        >
-           {loading ? (
-              <div className="w-5 h-5 border-4 border-white border-opacity-50 rounded-full animate-spin border-t-white"></div>
-            ) : (
-              'Sign Up'
-            )}
-          {/* Sign Up */}
-        </button>
-      </form>
-
-      <p className="text-sm text-center mt-4">
-        Already have an account?{" "}
-        <button
-          onClick={onSwitch}
-          className="text-teal-600 font-semibold hover:underline"
-        >
-          Login
-        </button>
-      </p>
+            Login
+          </button>
+        </p>
+      </div>
     </div>
   );
 }

@@ -46,7 +46,7 @@ export default function Hero() {
         >
           <Link to="/get-started"> 
             <button
-              className="px-35 py-4 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-xl hover:scale-105 transition"
+              className="px-28 py-4 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-xl hover:scale-105 transition"
             >
               Get Started
             </button>
@@ -56,7 +56,7 @@ export default function Hero() {
             onClick={() =>
               document.getElementById("learn-more")?.scrollIntoView({ behavior: "smooth" })
             }
-            className="px-35 py-4 rounded-lg bg-white text-indigo-700 font-semibold shadow-md hover:bg-gray-100 hover:scale-105 transition"
+            className="px-28 py-4 rounded-lg bg-white text-indigo-700 font-semibold shadow-md hover:bg-gray-100 hover:scale-105 transition"
           >
             Learn More
           </button>

@@ -20,27 +20,41 @@ export default function Login({ onSwitch }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  if (!form.email || !form.password || !form.course) {
+    setError("⚠ Please fill all fields");
+    setLoading(false);
+    return;
+  }
 
-    if (!form.email || !form.password || !form.course) {
-      setError("⚠ Please fill all fields");
-      return;
+  try {
+    const res = await fetch("http://localhost:5000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: form.email, password: form.password, role }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.message || "Enter Correct Password");
+    } else {
+      alert("✅ Login successful!");
+      login(data.user);
+      navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");z
     }
-
-    setLoading(true);
-    setError("");
-
-     setTimeout(() => {
-        setLoading(false);
-        console.log("Login form submitted successfully (simulated).");
-    }, 2000);
-
-    login({ name: role === "STUDENT" ? "Student" : "Teacher", role });
-    navigate(role === "STUDENT" ? "/student-dashboard" : "/teacher-dashboard");
+  } catch (err) {
+    setError("❌ Server error. Try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   //  const GoogleIcon = () => (
