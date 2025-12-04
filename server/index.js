@@ -28,7 +28,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Error:", err));
+  .catch((err) => console.error("MongoDB Error:", err));
 
 // OTP generator
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -83,11 +83,12 @@ app.post("/api/verify-otp", async (req, res) => {
 });
 
 // 3️⃣ Signup
-app.post("/api/signup", async (req, res) => {
+app.post("/api/SignUp", async (req, res) => {
   try {
     const { name, email, course, password, role } = req.body;
 
-    if (!name || !email || !course || !password || !role) {
+    // require course only for STUDENT
+    if (!name || !email || !password || !role || (role === "STUDENT" && !course)) {
       return res.status(400).json({ error: "All fields required" });
     }
 
@@ -99,7 +100,7 @@ app.post("/api/signup", async (req, res) => {
     const newUser = new User({
       name,
       email,
-      course,
+      course: course || null,
       password: hashedPassword,
       role,
     });
@@ -114,16 +115,26 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
+// ...existing code...
+
 // 4️⃣ Login
-app.post("/api/login", async (req, res) => {
+app.post("/api/Login", async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, course, role } = req.body;
 
     if (!email || !password || !role) {
       return res.status(400).json({ error: "All fields required" });
     }
 
-    const user = await User.findOne({ email, role });
+    // require course only for students
+    if (role === "STUDENT" && !course) {
+      return res.status(400).json({ error: "Course required for students" });
+    }
+
+    const query = { email, role };
+    if (role === "STUDENT") query.course = course;
+
+    const user = await User.findOne(query);
     if (!user) return res.status(400).json({ error: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -134,8 +145,11 @@ app.post("/api/login", async (req, res) => {
       user: { name: user.name, role: user.role },
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error: " + err.message });
   }
 });
+
+
 
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

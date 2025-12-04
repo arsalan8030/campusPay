@@ -1,9 +1,17 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+
+  //  Load saved login on refresh
+  useEffect(() => {
+    const saved = localStorage.getItem("cp_user");
+    if (saved) {
+      setUser(JSON.parse(saved));
+    }
+  }, []);
 
   const login = ({ name, role }) => {
     const u = { name, role };
